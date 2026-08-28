@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VisionCraft AI — Develop images from words</title>
+<link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="grain-overlay"></div>
+
+<header class="site-header">
+  <div class="brand">
+    <span class="brand-mark"></span>
+    VisionCraft <em>AI</em>
+  </div>
+  <div class="header-tag">darkroom for machine-made images</div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="hero-text">
+      <p class="eyebrow">text&nbsp;&rarr;&nbsp;image</p>
+      <h1>Type a thought.<br>Watch it <span class="develop-word">develop</span>.</h1>
+      <p class="hero-sub">Describe anything. VisionCraft sends it into the light and prints back a picture — no camera required.</p>
+      <div class="prompt-chips">
+        <button class="prompt-chip" data-prompt="a lighthouse made of stained glass, storm approaching">stained glass lighthouse</button>
+        <button class="prompt-chip" data-prompt="a fox curled asleep in autumn leaves, soft light">sleeping fox in autumn</button>
+        <button class="prompt-chip" data-prompt="a floating city above the clouds at golden hour">floating city, golden hour</button>
+        <button class="prompt-chip" data-prompt="a cat dancing under neon city lights">cat dancing, neon lights</button>
+      </div>
+    </div>
+
+    <div class="hero-visual" aria-hidden="true">
+      <svg viewBox="0 0 320 320" class="aperture-svg">
+        <circle cx="160" cy="160" r="140" class="aperture-ring aperture-ring-1"/>
+        <circle cx="160" cy="160" r="108" class="aperture-ring aperture-ring-2"/>
+        <g class="aperture-blades">
+          <path d="M160 40 L200 100 L160 160 L120 100 Z" class="blade" transform="rotate(0 160 160)"/>
+          <path d="M160 40 L200 100 L160 160 L120 100 Z" class="blade" transform="rotate(60 160 160)"/>
+          <path d="M160 40 L200 100 L160 160 L120 100 Z" class="blade" transform="rotate(120 160 160)"/>
+          <path d="M160 40 L200 100 L160 160 L120 100 Z" class="blade" transform="rotate(180 160 160)"/>
+          <path d="M160 40 L200 100 L160 160 L120 100 Z" class="blade" transform="rotate(240 160 160)"/>
+          <path d="M160 40 L200 100 L160 160 L120 100 Z" class="blade" transform="rotate(300 160 160)"/>
+        </g>
+        <circle cx="160" cy="160" r="38" class="aperture-core"/>
+      </svg>
+    </div>
+  </section>
+
+  <section class="darkroom reveal">
+    <div class="tray-panel">
+      <label class="tray-label">exposure // mode</label>
+      <div class="mode-tabs">
+        <button class="mode-tab is-active" id="tab-image" data-mode="image">Image</button>
+        <button class="mode-tab" id="tab-video" data-mode="video">Video</button>
+      </div>
+
+      <label class="tray-label" for="prompt-input">exposure // prompt</label>
+      <div class="input-row">
+        <input
+          type="text"
+          id="prompt-input"
+          placeholder="a lighthouse made of stained glass, storm approaching"
+          autocomplete="off"
+        >
+        <button id="generate-btn">
+          <span class="btn-label">Develop</span>
+        </button>
+      </div>
+      <p id="status-line" class="status-line">awaiting exposure</p>
+      <p class="video-note" id="video-note">Video mode animates a freshly generated image. It uses a free community service, so it can take a minute and may occasionally be busy.</p>
+    </div>
+
+    <div class="print-area">
+      <div class="print-frame" id="print-frame">
+        <div class="print-placeholder" id="print-placeholder">
+          <div class="placeholder-mark">◇</div>
+          <p>your print will surface here</p>
+        </div>
+        <img id="result-image" class="result-image" alt="Generated result">
+        <video id="result-video" class="result-image" autoplay loop muted playsinline></video>
+        <div class="developing-veil" id="developing-veil"></div>
+      </div>
+      <p class="print-caption" id="print-caption">&nbsp;</p>
+      <a id="download-link" class="download-link" download style="display:none;">↓ Download</a>
+    </div>
+  </section>
+
+  <section class="contact-sheet reveal">
+    <p class="sheet-label">contact sheet // recent prints</p>
+    <div class="sheet-strip" id="sheet-strip">
+      <p class="sheet-empty">Nothing developed yet — your first print will appear here.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <p>Built with Python, Flask &amp; the Pollinations.ai API — an internship project.</p>
+</footer>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+.env __pycache__/ *.pyc venv/ static/generated_images/ static/generated_videos/
