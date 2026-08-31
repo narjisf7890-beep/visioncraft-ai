@@ -19,7 +19,7 @@
 VisionCraft AI turns text prompts into AI-generated images through a clean, conversational interface — describe anything, and it "develops" a picture back, no camera required.
 
 Built as an internship project to explore full-stack AI application development: connecting a Python backend to multiple image-generation APIs, designing a production-style chat UI, and thinking through real product decisions like tiered pricing and deployment.
-
+![VisionCraft AI Screenshot](vision_craft.jpg)
 ## 🚀 Features
 
 - **Chat-style interface** — sidebar history + conversational feed, inspired by ChatGPT/Gemini
