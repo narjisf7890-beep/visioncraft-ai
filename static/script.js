@@ -1,200 +1,139 @@
 const promptInput = document.getElementById("prompt-input");
 const generateBtn = document.getElementById("generate-btn");
-const statusLine = document.getElementById("status-line");
-const resultImage = document.getElementById("result-image");
-const resultVideo = document.getElementById("result-video");
-const placeholder = document.getElementById("print-placeholder");
-const veil = document.getElementById("developing-veil");
-const caption = document.getElementById("print-caption");
-const downloadLink = document.getElementById("download-link");
-const sheetStrip = document.getElementById("sheet-strip");
-const tabImage = document.getElementById("tab-image");
-const tabVideo = document.getElementById("tab-video");
-const videoNote = document.getElementById("video-note");
+const emptyState = document.getElementById("empty-state");
+const messageFeed = document.getElementById("message-feed");
+const chatScroll = document.getElementById("chat-scroll");
+const historyList = document.getElementById("history-list");
+const newBtn = document.getElementById("new-btn");
+const sidebar = document.getElementById("sidebar");
+const sidebarToggle = document.getElementById("sidebar-toggle");
+const tierButtons = document.querySelectorAll(".tier-btn");
 
-let currentMode = "image"; // "image" or "video"
+let currentTier = "standard";
 
-function setStatus(text, mode) {
-  statusLine.textContent = text;
-  statusLine.classList.remove("is-active", "is-error");
-  if (mode) statusLine.classList.add(mode);
-}
+tierButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    currentTier = btn.dataset.tier;
+    tierButtons.forEach((b) => b.classList.toggle("is-active", b === btn));
+  });
+});
 
-function setMode(mode) {
-  currentMode = mode;
-  tabImage.classList.toggle("is-active", mode === "image");
-  tabVideo.classList.toggle("is-active", mode === "video");
-  videoNote.classList.toggle("is-visible", mode === "video");
-  setStatus("awaiting exposure", null);
-}
+// ---- Auto-resize the textarea as the person types ----
+promptInput.addEventListener("input", () => {
+  promptInput.style.height = "auto";
+  promptInput.style.height = Math.min(promptInput.scrollHeight, 140) + "px";
+});
 
-tabImage.addEventListener("click", () => setMode("image"));
-tabVideo.addEventListener("click", () => setMode("video"));
+promptInput.addEventListener("keydown", (event) => {
+  if (event.key === "Enter" && !event.shiftKey) {
+    event.preventDefault();
+    generateImage();
+  }
+});
 
-function resetPrintArea() {
-  resultImage.classList.remove("is-visible");
-  resultVideo.classList.remove("is-visible");
-  resultVideo.pause();
-  veil.classList.remove("is-developing");
-  placeholder.style.display = "none";
-  veil.style.display = "block";
-  downloadLink.style.display = "none";
+generateBtn.addEventListener("click", generateImage);
+
+function scrollToBottom() {
+  chatScroll.scrollTo({ top: chatScroll.scrollHeight, behavior: "smooth" });
 }
 
 async function generateImage() {
   const prompt = promptInput.value.trim();
-  if (!prompt) {
-    setStatus("write a description first", "is-error");
-    return;
-  }
+  if (!prompt) return;
 
+  emptyState.style.display = "none";
   generateBtn.disabled = true;
-  setStatus("sending exposure to the lab...", "is-active");
-  resetPrintArea();
+  promptInput.value = "";
+  promptInput.style.height = "auto";
+
+  // ---- Append the user's message bubble immediately ----
+  const pair = document.createElement("div");
+  pair.className = "message-pair";
+  pair.innerHTML = `
+    <div class="user-bubble"></div>
+    <div class="result-block">
+      <div class="result-frame is-loading"></div>
+    </div>
+  `;
+  pair.querySelector(".user-bubble").textContent = prompt;
+  messageFeed.appendChild(pair);
+  scrollToBottom();
+
+  const resultFrame = pair.querySelector(".result-frame");
+  const resultBlock = pair.querySelector(".result-block");
 
   try {
     const response = await fetch("/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt }),
+      body: JSON.stringify({ prompt, tier: currentTier }),
     });
 
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || "Something went wrong.");
 
-    await new Promise((resolve, reject) => {
-      resultImage.onload = resolve;
-      resultImage.onerror = reject;
-      resultImage.src = data.image_url;
-    });
-
-    resultImage.classList.add("is-visible");
-    requestAnimationFrame(() => veil.classList.add("is-developing"));
-
-    setStatus("print developed", null);
-    caption.textContent = `"${data.prompt}"`;
-    downloadLink.href = data.image_url;
-    downloadLink.download = data.image_url.split("/").pop();
-    downloadLink.style.display = "inline-flex";
-    addToContactSheet(data.image_url, "image");
-  } catch (error) {
-    setStatus(error.message || "could not develop this print", "is-error");
-    placeholder.style.display = "flex";
-    veil.style.display = "none";
-  } finally {
-    generateBtn.disabled = false;
-  }
-}
-
-async function generateVideo() {
-  const prompt = promptInput.value.trim();
-  if (!prompt) {
-    setStatus("write a description first", "is-error");
-    return;
-  }
-
-  generateBtn.disabled = true;
-  setStatus("developing source frame...", "is-active");
-  resetPrintArea();
-
-  const patienceTimer = setTimeout(() => {
-    setStatus("still animating — free service, can take a minute...", "is-active");
-  }, 8000);
-
-  try {
-    const response = await fetch("/generate-video", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt }),
-    });
-
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "Something went wrong.");
+    const img = document.createElement("img");
+    img.src = data.image_url;
+    img.alt = prompt;
 
     await new Promise((resolve, reject) => {
-      resultVideo.onloadeddata = resolve;
-      resultVideo.onerror = reject;
-      resultVideo.src = data.video_url;
+      img.onload = resolve;
+      img.onerror = reject;
     });
 
-    resultVideo.classList.add("is-visible");
-    veil.classList.add("is-developing");
-    resultVideo.play();
+    resultFrame.classList.remove("is-loading");
+    resultFrame.appendChild(img);
+    requestAnimationFrame(() => img.classList.add("is-visible"));
 
-    setStatus("clip developed", null);
-    caption.textContent = `"${data.prompt}"`;
-    downloadLink.href = data.video_url;
-    downloadLink.download = data.video_url.split("/").pop();
-    downloadLink.style.display = "inline-flex";
-    addToContactSheet(data.video_url, "video");
+    const actions = document.createElement("div");
+    actions.className = "result-actions";
+    actions.innerHTML = `<a class="download-link" download>↓ Download</a>`;
+    actions.querySelector(".download-link").href = data.image_url;
+    actions.querySelector(".download-link").download = data.image_url.split("/").pop();
+    resultBlock.appendChild(actions);
+
+    addToHistory(data.image_url, prompt);
   } catch (error) {
-    setStatus(error.message || "could not develop this clip", "is-error");
-    placeholder.style.display = "flex";
-    veil.style.display = "none";
+    resultFrame.classList.remove("is-loading");
+    resultFrame.classList.add("is-error");
+    resultFrame.textContent = error.message || "Could not develop this print.";
   } finally {
-    clearTimeout(patienceTimer);
     generateBtn.disabled = false;
+    scrollToBottom();
   }
 }
 
-async function generate() {
-  if (currentMode === "image") {
-    await generateImage();
-  } else {
-    await generateVideo();
-  }
-}
-
-function addToContactSheet(url, kind) {
-  const emptyMsg = sheetStrip.querySelector(".sheet-empty");
+function addToHistory(url, prompt) {
+  const emptyMsg = historyList.querySelector(".history-empty");
   if (emptyMsg) emptyMsg.remove();
 
-  const thumb = document.createElement(kind === "video" ? "div" : "img");
-  if (kind === "video") {
-    thumb.classList.add("is-video-tile");
-    thumb.textContent = "▶";
-  } else {
-    thumb.src = url;
-    thumb.alt = "Previously generated image";
-  }
-
-  thumb.addEventListener("click", () => {
-    if (kind === "video") {
-      resultImage.classList.remove("is-visible");
-      resultVideo.src = url;
-      resultVideo.classList.add("is-visible");
-      resultVideo.play();
-      setMode("video");
-    } else {
-      resultVideo.classList.remove("is-visible");
-      resultVideo.pause();
-      resultImage.src = url;
-      resultImage.classList.add("is-visible");
-      setMode("image");
-    }
+  const item = document.createElement("div");
+  item.className = "history-item";
+  item.innerHTML = `<img src="${url}" alt=""><span></span>`;
+  item.querySelector("span").textContent = prompt;
+  item.addEventListener("click", () => {
+    promptInput.value = prompt;
+    promptInput.focus();
+    if (window.innerWidth <= 860) sidebar.classList.remove("is-open");
   });
 
-  sheetStrip.prepend(thumb);
+  historyList.prepend(item);
 }
 
-generateBtn.addEventListener("click", generate);
-promptInput.addEventListener("keydown", (event) => {
-  if (event.key === "Enter") generate();
+// ---- New print: clears the feed and shows the welcome state again ----
+newBtn.addEventListener("click", () => {
+  messageFeed.innerHTML = "";
+  emptyState.style.display = "block";
+  promptInput.focus();
+  if (window.innerWidth <= 860) sidebar.classList.remove("is-open");
 });
 
-async function loadGallery() {
-  try {
-    const response = await fetch("/gallery");
-    const urls = await response.json();
-    if (urls.length > 0) {
-      sheetStrip.innerHTML = "";
-      urls.forEach((url) => addToContactSheet(url, "image"));
-    }
-  } catch (error) {
-    // gallery is a nice-to-have, not critical
-  }
-}
-// ---- Prompt chips: clicking one fills the input and focuses it ----
+// ---- Mobile sidebar toggle ----
+sidebarToggle.addEventListener("click", () => {
+  sidebar.classList.toggle("is-open");
+});
+
+// ---- Prompt chips ----
 document.querySelectorAll(".prompt-chip").forEach((chip) => {
   chip.addEventListener("click", () => {
     promptInput.value = chip.dataset.prompt;
@@ -202,19 +141,15 @@ document.querySelectorAll(".prompt-chip").forEach((chip) => {
   });
 });
 
-// ---- Scroll-reveal: fade sections in as they enter the viewport ----
-const revealObserver = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("is-revealed");
-        revealObserver.unobserve(entry.target);
-      }
-    });
-  },
-  { threshold: 0.15 }
-);
-
-document.querySelectorAll(".reveal").forEach((el) => revealObserver.observe(el));
+// ---- Load previously generated images into the sidebar on page load ----
+async function loadGallery() {
+  try {
+    const response = await fetch("/gallery");
+    const urls = await response.json();
+    urls.forEach((url) => addToHistory(url, "Previous print"));
+  } catch (error) {
+    // history is a nice-to-have, not critical
+  }
+}
 
 loadGallery();

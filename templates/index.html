@@ -13,95 +13,84 @@
 
 <div class="grain-overlay"></div>
 
-<header class="site-header">
-  <div class="brand">
-    <span class="brand-mark"></span>
-    VisionCraft <em>AI</em>
-  </div>
-  <div class="header-tag">darkroom for machine-made images</div>
-</header>
+<div class="app-shell">
 
-<main>
-  <section class="hero">
-    <div class="hero-text">
-      <p class="eyebrow">text&nbsp;&rarr;&nbsp;image</p>
-      <h1>Type a thought.<br>Watch it <span class="develop-word">develop</span>.</h1>
-      <p class="hero-sub">Describe anything. VisionCraft sends it into the light and prints back a picture — no camera required.</p>
-      <div class="prompt-chips">
-        <button class="prompt-chip" data-prompt="a lighthouse made of stained glass, storm approaching">stained glass lighthouse</button>
-        <button class="prompt-chip" data-prompt="a fox curled asleep in autumn leaves, soft light">sleeping fox in autumn</button>
-        <button class="prompt-chip" data-prompt="a floating city above the clouds at golden hour">floating city, golden hour</button>
-        <button class="prompt-chip" data-prompt="a cat dancing under neon city lights">cat dancing, neon lights</button>
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="brand">
+        <span class="brand-mark"></span>
+        VisionCraft <em>AI</em>
       </div>
+      <button class="new-btn" id="new-btn" title="Start a new print">
+        <span>+</span> New print
+      </button>
     </div>
 
-    <div class="hero-visual" aria-hidden="true">
-      <svg viewBox="0 0 320 320" class="aperture-svg">
-        <circle cx="160" cy="160" r="140" class="aperture-ring aperture-ring-1"/>
-        <circle cx="160" cy="160" r="108" class="aperture-ring aperture-ring-2"/>
-        <g class="aperture-blades">
-          <path d="M160 40 L200 100 L160 160 L120 100 Z" class="blade" transform="rotate(0 160 160)"/>
-          <path d="M160 40 L200 100 L160 160 L120 100 Z" class="blade" transform="rotate(60 160 160)"/>
-          <path d="M160 40 L200 100 L160 160 L120 100 Z" class="blade" transform="rotate(120 160 160)"/>
-          <path d="M160 40 L200 100 L160 160 L120 100 Z" class="blade" transform="rotate(180 160 160)"/>
-          <path d="M160 40 L200 100 L160 160 L120 100 Z" class="blade" transform="rotate(240 160 160)"/>
-          <path d="M160 40 L200 100 L160 160 L120 100 Z" class="blade" transform="rotate(300 160 160)"/>
-        </g>
-        <circle cx="160" cy="160" r="38" class="aperture-core"/>
-      </svg>
+    <p class="sidebar-label">contact sheet</p>
+    <div class="history-list" id="history-list">
+      <p class="history-empty">Nothing developed yet.</p>
     </div>
-  </section>
 
-  <section class="darkroom reveal">
-    <div class="tray-panel">
-      <label class="tray-label">exposure // mode</label>
-      <div class="mode-tabs">
-        <button class="mode-tab is-active" id="tab-image" data-mode="image">Image</button>
-        <button class="mode-tab" id="tab-video" data-mode="video">Video</button>
+    <div class="sidebar-footer">
+      <p>Python · Flask · Imagen 4</p>
+    </div>
+  </aside>
+
+  <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle sidebar">☰</button>
+
+  <!-- Main chat area -->
+  <main class="chat-main">
+
+    <div class="chat-scroll" id="chat-scroll">
+      <div class="empty-state" id="empty-state">
+        <svg viewBox="0 0 320 320" class="aperture-svg">
+          <circle cx="160" cy="160" r="140" class="aperture-ring aperture-ring-1"/>
+          <circle cx="160" cy="160" r="108" class="aperture-ring aperture-ring-2"/>
+          <g class="aperture-blades">
+            <path d="M160 40 L200 100 L160 160 L120 100 Z" class="blade" transform="rotate(0 160 160)"/>
+            <path d="M160 40 L200 100 L160 160 L120 100 Z" class="blade" transform="rotate(60 160 160)"/>
+            <path d="M160 40 L200 100 L160 160 L120 100 Z" class="blade" transform="rotate(120 160 160)"/>
+            <path d="M160 40 L200 100 L160 160 L120 100 Z" class="blade" transform="rotate(180 160 160)"/>
+            <path d="M160 40 L200 100 L160 160 L120 100 Z" class="blade" transform="rotate(240 160 160)"/>
+            <path d="M160 40 L200 100 L160 160 L120 100 Z" class="blade" transform="rotate(300 160 160)"/>
+          </g>
+          <circle cx="160" cy="160" r="38" class="aperture-core"/>
+        </svg>
+        <h1>Type a thought.<br>Watch it <span class="develop-word">develop</span>.</h1>
+        <p>Describe anything, and VisionCraft prints back a picture.</p>
+        <div class="prompt-chips">
+          <button class="prompt-chip" data-prompt="a lighthouse made of stained glass, storm approaching">stained glass lighthouse</button>
+          <button class="prompt-chip" data-prompt="a fox curled asleep in autumn leaves, soft light">sleeping fox in autumn</button>
+          <button class="prompt-chip" data-prompt="a floating city above the clouds at golden hour">floating city, golden hour</button>
+          <button class="prompt-chip" data-prompt="a cat dancing under neon city lights">cat dancing, neon lights</button>
+        </div>
       </div>
 
-      <label class="tray-label" for="prompt-input">exposure // prompt</label>
-      <div class="input-row">
-        <input
-          type="text"
+      <div class="message-feed" id="message-feed"></div>
+    </div>
+
+    <div class="composer">
+      <div class="tier-toggle" id="tier-toggle">
+        <button class="tier-btn is-active" data-tier="standard">Standard <span class="tier-tag">free</span></button>
+        <button class="tier-btn" data-tier="premium">Premium <span class="tier-tag">better quality</span></button>
+      </div>
+      <div class="composer-inner">
+        <textarea
           id="prompt-input"
-          placeholder="a lighthouse made of stained glass, storm approaching"
+          placeholder="Describe an image..."
+          rows="1"
           autocomplete="off"
-        >
-        <button id="generate-btn">
-          <span class="btn-label">Develop</span>
+        ></textarea>
+        <button id="generate-btn" title="Develop">
+          <svg viewBox="0 0 24 24" width="18" height="18"><path d="M12 19V5M12 5l-6 6M12 5l6 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
       </div>
-      <p id="status-line" class="status-line">awaiting exposure</p>
-      <p class="video-note" id="video-note">Video mode animates a freshly generated image. It uses a free community service, so it can take a minute and may occasionally be busy.</p>
+      <p class="composer-hint">VisionCraft AI can produce unexpected results — regenerate if a print doesn't come out right.</p>
     </div>
 
-    <div class="print-area">
-      <div class="print-frame" id="print-frame">
-        <div class="print-placeholder" id="print-placeholder">
-          <div class="placeholder-mark">◇</div>
-          <p>your print will surface here</p>
-        </div>
-        <img id="result-image" class="result-image" alt="Generated result">
-        <video id="result-video" class="result-image" autoplay loop muted playsinline></video>
-        <div class="developing-veil" id="developing-veil"></div>
-      </div>
-      <p class="print-caption" id="print-caption">&nbsp;</p>
-      <a id="download-link" class="download-link" download style="display:none;">↓ Download</a>
-    </div>
-  </section>
-
-  <section class="contact-sheet reveal">
-    <p class="sheet-label">contact sheet // recent prints</p>
-    <div class="sheet-strip" id="sheet-strip">
-      <p class="sheet-empty">Nothing developed yet — your first print will appear here.</p>
-    </div>
-  </section>
-</main>
-
-<footer class="site-footer">
-  <p>Built with Python, Flask &amp; the Pollinations.ai API — an internship project.</p>
-</footer>
+  </main>
+</div>
 
 <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
