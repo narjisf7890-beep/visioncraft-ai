@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Plans - VisionCraft AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="auth-page">
+    <div class="auth-card">
+
+        <h1>Choose Your Plan</h1>
+
+        <div>
+            <h2>Free Plan</h2>
+            <p>✓ Standard image generation</p>
+            <p>✓ Limited usage</p>
+        </div>
+
+        <hr>
+
+        <div>
+            <h2>Premium Plan ⭐</h2>
+            <p>✓ High quality AI images</p>
+            <p>✓ Faster generation</p>
+            <p>✓ Premium AI model access</p>
+
+            <form action="/upgrade/confirm" method="POST">
+                <button type="submit">
+                    Upgrade Now
+                </button>
+            </form>
+
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

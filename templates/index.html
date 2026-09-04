@@ -32,8 +32,25 @@
       <p class="history-empty">Nothing developed yet.</p>
     </div>
 
-    <div class="sidebar-footer">
-      <p>Python · Flask · Imagen 4</p>
+    
+
+    <div class="account-bar">
+      {% if current_user.is_authenticated %}
+        <p class="account-email">{{ current_user.email }}</p>
+        <span class="account-badge {{ 'is-premium' if current_user.is_premium else 'is-free' }}">
+          {{ 'PRO' if current_user.is_premium else 'Free' }}
+        </span>
+        {% if current_user.is_premium %}
+          <p class="credits-remaining">{{ current_user.credits }} credit{{ 's' if current_user.credits != 1 else '' }} left</p>
+        {% endif %}
+        <p>
+          {% if not current_user.is_premium %}<a href="{{ url_for('upgrade') }}">Upgrade</a> · {% endif %}
+          {% if current_user.is_premium and current_user.credits <= 0 %}<a href="{{ url_for('upgrade') }}">Buy more credits</a> · {% endif %}
+          <a href="{{ url_for('logout') }}">Log out</a>
+        </p>
+      {% else %}
+        <p><a href="{{ url_for('login') }}">Log in</a> · <a href="{{ url_for('signup') }}">Sign up</a></p>
+      {% endif %}
     </div>
   </aside>
 

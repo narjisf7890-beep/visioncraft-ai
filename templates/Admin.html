@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — VisionCraft AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<style>
+  .admin-wrap { max-width: 1000px; margin: 40px auto; padding: 0 24px; }
+  .admin-title { font-family: var(--font-display); font-size: 2rem; margin-bottom: 6px; }
+  .admin-sub { color: var(--slate); margin-bottom: 30px; }
+  .stats-row { display: flex; gap: 16px; margin-bottom: 34px; flex-wrap: wrap; }
+  .stat-card {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 18px 22px; min-width: 160px; flex: 1;
+  }
+  .stat-card .label { font-family: var(--font-mono); font-size: 0.72rem; color: var(--slate); text-transform: uppercase; }
+  .stat-card .value { font-family: var(--font-display); font-size: 1.8rem; margin-top: 6px; color: var(--paper); }
+  .stat-card.highlight .value { color: var(--safelight); }
+  table { width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  th, td { text-align: left; padding: 12px 16px; font-size: 0.86rem; border-bottom: 1px solid var(--line); }
+  th { font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; color: var(--slate); }
+  tr:last-child td { border-bottom: none; }
+  .badge-pro { background: var(--safelight); color: var(--ink); padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-family: var(--font-mono); }
+  .badge-free { background: var(--line); color: var(--slate); padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-family: var(--font-mono); }
+  .back-link { display: inline-block; margin-top: 24px; color: var(--safelight); text-decoration: none; font-size: 0.86rem; }
+</style>
+</head>
+<body>
+<div class="admin-wrap">
+  <h1 class="admin-title">Admin Dashboard</h1>
+  <p class="admin-sub">Overview of VisionCraft AI users and revenue.</p>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="label">Total Users</div>
+      <div class="value">{{ total_users }}</div>
+    </div>
+    <div class="stat-card highlight">
+      <div class="label">Pro Users</div>
+      <div class="value">{{ total_pro }}</div>
+    </div>
+    <div class="stat-card highlight">
+      <div class="label">Estimated Revenue</div>
+      <div class="value">Rs. {{ estimated_revenue }}</div>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Email</th>
+        <th>Status</th>
+        <th>Credits</th>
+        <th>Joined</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+      <tr>
+        <td>{{ user.email }}</td>
+        <td>
+          {% if user.is_premium %}
+            <span class="badge-pro">PRO</span>
+          {% else %}
+            <span class="badge-free">FREE</span>
+          {% endif %}
+        </td>
+        <td>{{ user.credits }}</td>
+        <td>{{ user.created_at.strftime('%d %b %Y') }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <a href="{{ url_for('index') }}" class="back-link">← Back to VisionCraft</a>
+</div>
+</body>
+</html>

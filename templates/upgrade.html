@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Upgrade to Premium — VisionCraft AI</title>
+<link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="brand"><span class="brand-mark"></span> VisionCraft <em>AI</em></div>
+    <h1>Upgrade to Premium</h1>
+    <p class="auth-sub">Rs. 1500 for 100 premium-quality image credits.</p>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="auth-flash">{{ messages[0] }}</div>
+      {% endif %}
+    {% endwith %}
+
+    <!--
+      SANDBOX (test mode) Safepay Quick Link.
+      Replace this with your LIVE Quick Link once the real Safepay account is approved.
+    -->
+    <a href="https://sandbox.api.getsafepay.com/io/quick-link?ql=link_47d7ea52-8c9b-4120-9936-53a03f4fb7aa" target="_blank" class="pay-button">
+      Pay with Safepay — Rs. 1500 (100 Credits)
+    </a>
+
+    <p class="auth-hint">
+      After paying, come back here and click below to activate your Premium access.
+    </p>
+
+    <form method="POST" action="{{ url_for('upgrade_confirm') }}" class="auth-form">
+      <button type="submit">I've completed payment</button>
+    </form>
+
+    <p class="auth-back"><a href="{{ url_for('index') }}">← Back to VisionCraft</a></p>
+  </div>
+</div>
+</body>
+</html>

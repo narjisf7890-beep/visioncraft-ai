@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign up — VisionCraft AI</title>
+<link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="brand"><span class="brand-mark"></span> VisionCraft <em>AI</em></div>
+    <h1>Create your account</h1>
+    <p class="auth-sub">Sign up to save your prints and unlock Premium.</p>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="auth-flash">{{ messages[0] }}</div>
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" class="auth-form">
+      <label>Email</label>
+      <input type="email" name="email" placeholder="you@example.com" required autofocus>
+      <label>Password</label>
+      <input type="password" name="password" placeholder="At least 6 characters" required minlength="6">
+      <button type="submit">Sign up</button>
+    </form>
+
+    <p class="auth-switch">Already have an account? <a href="{{ url_for('login') }}">Log in</a></p>
+    <p class="auth-back"><a href="{{ url_for('index') }}">← Back to VisionCraft</a></p>
+  </div>
+</div>
+</body>
+</html>

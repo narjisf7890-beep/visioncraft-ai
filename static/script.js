@@ -8,6 +8,7 @@ const newBtn = document.getElementById("new-btn");
 const sidebar = document.getElementById("sidebar");
 const sidebarToggle = document.getElementById("sidebar-toggle");
 const tierButtons = document.querySelectorAll(".tier-btn");
+const creditsDisplay = document.querySelector(".credits-remaining");
 
 let currentTier = "standard";
 
@@ -70,7 +71,21 @@ async function generateImage() {
     });
 
     const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "Something went wrong.");
+    if (!response.ok) {
+      if (data.requires_login) {
+        window.location.href = "/login";
+        return;
+      }
+      if (data.requires_upgrade) {
+        window.location.href = "/upgrade";
+        return;
+      }
+      if (data.requires_credits) {
+        window.location.href = "/upgrade";
+        return;
+      }
+      throw new Error(data.error || "Something went wrong.");
+    }
 
     const img = document.createElement("img");
     img.src = data.image_url;
@@ -93,6 +108,11 @@ async function generateImage() {
     resultBlock.appendChild(actions);
 
     addToHistory(data.image_url, prompt);
+
+    // Keep the sidebar credit count in sync after a premium generation
+    if (data.credits_remaining !== null && data.credits_remaining !== undefined && creditsDisplay) {
+      creditsDisplay.textContent = `${data.credits_remaining} credit${data.credits_remaining !== 1 ? "s" : ""} left`;
+    }
   } catch (error) {
     resultFrame.classList.remove("is-loading");
     resultFrame.classList.add("is-error");
@@ -111,6 +131,7 @@ function addToHistory(url, prompt) {
   item.className = "history-item";
   item.innerHTML = `<img src="${url}" alt=""><span></span>`;
   item.querySelector("span").textContent = prompt;
+  item.title = prompt;
   item.addEventListener("click", () => {
     promptInput.value = prompt;
     promptInput.focus();
@@ -145,8 +166,8 @@ document.querySelectorAll(".prompt-chip").forEach((chip) => {
 async function loadGallery() {
   try {
     const response = await fetch("/gallery");
-    const urls = await response.json();
-    urls.forEach((url) => addToHistory(url, "Previous print"));
+    const items = await response.json();
+    items.forEach((item) => addToHistory(item.url, item.prompt));
   } catch (error) {
     // history is a nice-to-have, not critical
   }
